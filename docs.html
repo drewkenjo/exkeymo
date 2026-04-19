@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Android external keyboard remapping without root">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android external keyboard remapping without root</title>
+    <link rel="stylesheet" href="./common.css">
+</head>
+<body>
+<div class="container">
+    <a class="github-link" href="https://github.com/ris58h/exkeymo-server">
+        <picture>
+            <source srcset="img/github-mark-white.png" media="(prefers-color-scheme: dark)">
+            <img src="img/github-mark.png" alt="GitHub">
+        </picture>
+    </a>
+
+    <h1>Android external keyboard remapping without root</h1>
+    <nav>
+        <a href="simple.html">Simple</a>
+        <a href="complex.html">Complex</a>
+        <b>Docs</b>
+    </nav>
+
+    <p>
+        Since Android 4.1 an app can provide additional keyboard layouts via <a target="_blank" href="https://source.android.com/docs/core/input/key-character-map-files">Key Character Map</a> files.
+        Since then, it's possible to customize a keyboard layout without root access by installing an app that contains requred layout.
+        ExKeyMo helps you to build such app even if you don't know anything about Android development.
+    </p>
+
+    <h2>How to</h2>
+    <ol>
+        <li>
+            Create an app with your custom layout built-in.
+            Use <a href="simple.html">simple</a> UI for key remapping.
+            Use <a href="complex.html">complex</a> UI to provide your own Key Character Map file(s).
+        </li>
+        <li>
+            Install the app.
+            The app is self-signed so Android will warn you about untrusted source or something like this.
+            Note: if you install the app and get an error, try to uninstall the previous version first, if you have any.
+        </li>
+        <li>
+            Go to <kbd>Settings -> Language &amp; input -> Physical keyboard</kbd> (the exact path may vary),
+            choose the keyboard you want to customize, and select <kbd>ExKeyMo Layout</kbd>.
+        </li>
+    </ol>
+
+    <h2>Layout customization</h2>
+    <p>
+        The keyboard layout is customized via <a target="_blank" href="https://source.android.com/docs/core/input/key-character-map-files">Key Character Map</a> file.
+        To remap a physical key use <code>map key SCAN_CODE ANDROID_KEY</code> syntax
+        where <code>SCAN_CODE</code> is the code that produced by the physical key
+        and <code>ANDROID_KEY</code> is an Android key such as <code>ENTER</code>,
+        <code>BRIGHTNESS_UP</code> or just a plain character like <code>1</code> or <code>A</code>.
+        The default keyboard layout can be found in <a target="_blank" href="https://android.googlesource.com/platform/frameworks/base/+/master/data/keyboards/Generic.kl">Generic.kl</a> file in format <code>key SCAN_CODE ANDROID_KEY</code>.
+    </p>
+    <p>
+        For example you want to swap <kbd>Caps Lock</kbd> key and <kbd>Esc</kbd> key.
+        To do this you need to map <kbd>Caps Lock</kbd> key to <kbd>Esc</kbd> key and vice versa.
+        According to <a target="_blank" href="https://android.googlesource.com/platform/frameworks/base/+/master/data/keyboards/Generic.kl">Generic.kl</a>
+        the default <code>SCAN_CODE</code> to <code>ANDROID_KEY</code> mapping these keys are <code>1</code> to <code>ESCAPE</code> and <code>58</code> to <code>CAPS_LOCK</code>.
+        Now you can add desired mappings to your custom layout in format <code>map key SCAN_CODE ANDROID_KEY</code>.
+        And don't forget to include <a target="_blank" href="https://android.googlesource.com/platform/frameworks/base/+/master/data/keyboards/Generic.kcm">default mappings</a>
+        by adding <code>type OVERLAY</code> as the very first line.
+        The final result will be:
+    </p>
+    <pre>
+type OVERLAY
+
+map key 58 ESCAPE
+map key 1 CAPS_LOCK
+</pre>
+    <p>
+        Some keyboards have media-keys or other keys that don't work as expected.
+        To remap them you should find out what scan codes they produce.
+        There are several Android apps to do it.
+        For example <a target="_blank" href="https://play.google.com/store/apps/details?id=ru.elron.gamepadtester">Gamepad tester</a>.
+    </p>
+    <p>
+        More complex customization (combinations with modifier keys like <kbd>Ctrl</kbd>, <kbd>Alt</kbd>, <kbd>Shift</kbd>
+        or producing non-English characters) is also possible.
+        Learn more in <a target="_blank" href="https://source.android.com/docs/core/input/key-character-map-files#how-key-combinations-are-mapped-to-behaviors">official documentation</a>.
+    </p>
+
+    <h2>Second Layout</h2>
+    <p>
+        A second layout is useful if you use multiple languages.
+    </p>
+    <p>
+        For example you still want to swap <kbd>Caps Lock</kbd> key and <kbd>Esc</kbd> key,
+        but you need to do it for a language other than English.
+        Find the default KCM-file for your language <a target="_blank" href="https://android.googlesource.com/platform/frameworks/base/+/master/packages/InputDevices/res/raw">here</a>.
+        Add corresponding mappings. The final result will be:
+    </p>
+    <pre>
+# Multiple lines
+# with content
+# of
+# KCM-file
+# you copied
+# from https://android.googlesource.com/platform/frameworks/base/+/master/packages/InputDevices/res/raw
+
+map key 58 ESCAPE
+map key 1 CAPS_LOCK
+</pre>
+    <p/>
+
+    <h2>Validation</h2>
+    <p>
+        Unfortunately Android won't warn you if loaded KCM-file is incorrect and what errors are there.
+        But there is <a target="_blank" href="https://ris58h.github.io/validatekeymaps/">web-version</a>
+        of <a target="_blank" href="https://source.android.com/docs/core/interaction/input/validate-keymaps">validatekeymaps</a> tool
+        to validate the syntax of your KCM-file.
+    </p>
+
+    <h2>Limitations</h2>
+    <p>
+        Only two keyboard layouts are supported. It may be changed in the future.
+        If you need multiple custom keyboard layouts (for example for multiple languages),
+        take a look at <a target="_blank" href="https://github.com/ris58h/custom-keyboard-layout">Custom Keyboard Layout</a> project.
+    </p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Android external keyboard remapping without root">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android external keyboard remapping without root</title>
+    <link rel="stylesheet" href="./common.css">
+    <style>
+        form {
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+
+            /* <table cellspacing="0"/> */
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        /* <table cellpadding="0"/> */
+        th, td {
+            padding: 0;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        td select {
+            width: 100%;
+        }
+
+        td:not(:last-child) {
+            padding-right: 8px;
+        }
+
+        td:last-child {
+            text-align: right;
+        }
+
+        #status {
+            margin-top: 8px;
+            color: #c00;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a class="github-link" href="https://github.com/ris58h/exkeymo-server">
+        <picture>
+            <source srcset="img/github-mark-white.png" media="(prefers-color-scheme: dark)">
+            <img src="img/github-mark.png" alt="GitHub">
+        </picture>
+    </a>
+
+    <h1>Android external keyboard remapping without root</h1>
+    <nav>
+        <b>Simple</b>
+        <a href="complex.html">Complex</a>
+        <a href="docs.html">Docs</a>
+    </nav>
+
+    <p>
+        Specify mappings below,
+        download and install ExKeyMo app,
+        select ExKeyMo layout in physical keyboard settings.
+    </p>
+
+    <form id="build-form">
+        <table>
+            <thead>
+                <tr>
+                    <th>From key</th>
+                    <th>To key</th>
+                </tr>
+                </thead>
+            <tbody id="tbody"></tbody>
+            <tfoot>
+                <tr>
+                    <td>
+                        <button id="add" type="button">Add key map</button>
+                    </td>
+                    <td></td>
+                    <td>
+                        <button id="removeAll" type="button">Remove all</button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <p>
+            <label for="layout" style="display: block;">Base layout:</label>
+            <select id="layout" name="layout" style="display: block;">
+                <option value="" selected>Default</option>
+            </select>
+            <label for="layout2" style="display: block;">Second layout:</label>
+            <select id="layout2" name="layout2" style="display: block;">
+                <option value="-" selected>Not needed</option>
+                <option value="">Default</option>
+            </select>
+        </p>
+        <input type="submit" value="Download">
+        <div id="status" role="status" aria-live="polite"></div>
+    </form>
+
+    <template id="linux-keycodes">
+        <optgroup label="Modifiers">
+            <option value="58">CAPS_LOCK</option>
+            <option value="42">SHIFT_LEFT</option>
+            <option value="54">SHIFT_RIGHT</option>
+            <option value="29">CTRL_LEFT</option>
+            <option value="97">CTRL_RIGHT</option>
+            <option value="56">ALT_LEFT</option>
+            <option value="100">ALT_RIGHT</option>
+            <option value="125">META_LEFT</option>
+            <option value="126">META_RIGHT</option>
+            <option value="464">FUNCTION</option>
+        </optgroup>
+        <optgroup label="Controls and symbols">
+            <option value="1">ESCAPE</option>
+            <option value="12">MINUS</option>
+            <option value="13">EQUALS</option>
+            <option value="14">DEL</option>
+            <option value="15">TAB</option>
+            <option value="26">LEFT_BRACKET</option>
+            <option value="27">RIGHT_BRACKET</option>
+            <option value="28">ENTER</option>
+            <option value="39">SEMICOLON</option>
+            <option value="40">APOSTROPHE</option>
+            <option value="41">GRAVE</option>
+            <option value="43">BACKSLASH</option>
+            <option value="51">COMMA</option>
+            <option value="52">PERIOD</option>
+            <option value="53">SLASH</option>
+            <option value="57">SPACE</option>
+            <option value="86">102ND</option>
+            <option value="110">INSERT</option>
+            <option value="111">FORWARD_DEL</option>
+        </optgroup>
+        <optgroup label="Navigation">
+            <option value="103">DPAD_UP</option>
+            <option value="108">DPAD_DOWN</option>
+            <option value="105">DPAD_LEFT</option>
+            <option value="106">DPAD_RIGHT</option>
+            <option value="353">DPAD_CENTER</option>
+            <option value="104">PAGE_UP</option>
+            <option value="109">PAGE_DOWN</option>
+            <option value="177">SCROLL_UP</option>
+            <option value="178">SCROLL_DOWN</option>
+            <option value="102">MOVE_HOME</option>
+            <option value="107">MOVE_END</option>
+        </optgroup>
+        <optgroup label="Letters">
+            <option value="30">A</option>
+            <option value="48">B</option>
+            <option value="46">C</option>
+            <option value="32">D</option>
+            <option value="18">E</option>
+            <option value="33">F</option>
+            <option value="34">G</option>
+            <option value="35">H</option>
+            <option value="23">I</option>
+            <option value="36">J</option>
+            <option value="37">K</option>
+            <option value="38">L</option>
+            <option value="50">M</option>
+            <option value="49">N</option>
+            <option value="24">O</option>
+            <option value="25">P</option>
+            <option value="16">Q</option>
+            <option value="19">R</option>
+            <option value="31">S</option>
+            <option value="20">T</option>
+            <option value="22">U</option>
+            <option value="47">V</option>
+            <option value="17">W</option>
+            <option value="45">X</option>
+            <option value="21">Y</option>
+            <option value="44">Z</option>
+        </optgroup>
+        <optgroup label="Numbers">
+            <option value="2">1</option>
+            <option value="3">2</option>
+            <option value="4">3</option>
+            <option value="5">4</option>
+            <option value="6">5</option>
+            <option value="7">6</option>
+            <option value="8">7</option>
+            <option value="9">8</option>
+            <option value="10">9</option>
+            <option value="11">0</option>
+        </optgroup>
+        <optgroup label="Function">
+            <option value="59">F1</option>
+            <option value="60">F2</option>
+            <option value="61">F3</option>
+            <option value="62">F4</option>
+            <option value="63">F5</option>
+            <option value="64">F6</option>
+            <option value="65">F7</option>
+            <option value="66">F8</option>
+            <option value="67">F9</option>
+            <option value="68">F10</option>
+            <option value="87">F11</option>
+            <option value="88">F12</option>
+        </optgroup>
+        <optgroup label="Media">
+            <option value="224">BRIGHTNESS_DOWN</option>
+            <option value="225">BRIGHTNESS_UP</option>
+
+            <option value="113">VOLUME_MUTE</option>
+            <option value="114">VOLUME_DOWN</option>
+            <option value="115">VOLUME_UP</option>
+
+            <option value="168">MEDIA_REWIND</option>
+            <option value="164">MEDIA_PLAY_PAUSE</option>
+            <option value="208">MEDIA_FAST_FORWARD</option>
+        </optgroup>
+        <optgroup label="Keypad">
+            <option value="69">NUM_LOCK</option>
+            <option value="98">NUMPAD_DIVIDE</option>
+            <option value="55">NUMPAD_MULTIPLY</option>
+            <option value="74">NUMPAD_SUBTRACT</option>
+            <option value="78">NUMPAD_ADD</option>
+            <option value="96">NUMPAD_ENTER</option>
+            <option value="79">NUMPAD_1</option>
+            <option value="80">NUMPAD_2</option>
+            <option value="81">NUMPAD_3</option>
+            <option value="75">NUMPAD_4</option>
+            <option value="76">NUMPAD_5</option>
+            <option value="77">NUMPAD_6</option>
+            <option value="71">NUMPAD_7</option>
+            <option value="72">NUMPAD_8</option>
+            <option value="73">NUMPAD_9</option>
+            <option value="82">NUMPAD_0</option>
+            <option value="83">NUMPAD_DOT</option>
+            <option value="95">NUMPAD_JP_COMMA</option>
+            <option value="121">NUMPAD_COMMA</option>
+            <option value="117">NUMPAD_EQUALS</option>
+            <option value="179">NUMPAD_LEFT_PAREN</option>
+            <option value="180">NUMPAD_RIGHT_PAREN</option>
+        </optgroup>
+        <optgroup label="Gamepad">
+            <option value="304">BUTTON_A</option>
+            <option value="305">BUTTON_B</option>
+            <option value="306">BUTTON_C</option>
+            <option value="307">BUTTON_X</option>
+            <option value="308">BUTTON_Y</option>
+            <option value="309">BUTTON_Z</option>
+            <option value="310">BUTTON_L1</option>
+            <option value="311">BUTTON_R1</option>
+            <option value="312">BUTTON_L2</option>
+            <option value="313">BUTTON_R2</option>
+            <option value="314">BUTTON_SELECT</option>
+            <option value="315">BUTTON_START</option>
+            <option value="316">BUTTON_MODE</option>
+            <option value="317">BUTTON_THUMBL</option>
+            <option value="318">BUTTON_THUMBR</option>
+        </optgroup>
+        <optgroup label="TV">
+            <option value="362">GUIDE</option>
+            <option value="366">DVR</option>
+            <option value="370">CAPTIONS</option>
+            <option value="377">TV</option>
+            <option value="398">PROG_RED</option>
+            <option value="399">PROG_GREEN</option>
+            <option value="400">PROG_YELLOW</option>
+            <option value="401">PROG_BLUE</option>
+            <option value="402">CHANNEL_UP</option>
+            <option value="403">CHANNEL_DOWN</option>
+            <option value="405">LAST_CHANNEL</option>
+        </optgroup>
+        <optgroup label="Other">
+            <option value="70">SCROLL_LOCK</option>
+            <option value="85">ZENKAKU_HANKAKU</option>
+            <option value="89">RO</option>
+            <option value="92">HENKAN</option>
+            <option value="93">KATAKANA_HIRAGANA</option>
+            <option value="94">MUHENKAN</option>
+            <option value="99">SYSRQ</option>
+            <option value="116">POWER</option>
+            <option value="119">BREAK</option>
+            <option value="122">KANA</option>
+            <option value="123">EISU</option>
+            <option value="124">YEN</option>
+            <option value="127">MENU</option>
+            <option value="133">COPY</option>
+            <option value="135">PASTE</option>
+            <option value="137">CUT</option>
+            <option value="139">MENU</option>
+            <option value="140">CALCULATOR</option>
+            <option value="142">SLEEP</option>
+            <option value="143">WAKEUP</option>
+            <option value="150">EXPLORER</option>
+            <option value="152">POWER</option>
+            <option value="155">ENVELOPE</option>
+            <option value="156">BOOKMARK</option>
+            <option value="158">BACK</option>
+            <option value="159">FORWARD</option>
+            <option value="169">CALL</option>
+            <option value="171">MUSIC</option>
+            <option value="172">HOME</option>
+            <option value="173">REFRESH</option>
+            <option value="204">NOTIFICATION</option>
+            <option value="212">CAMERA</option>
+            <option value="213">MUSIC</option>
+            <option value="215">ENVELOPE</option>
+            <option value="217">SEARCH</option>
+            <option value="226">HEADSETHOOK</option>
+            <option value="397">CALENDAR</option>
+            <option value="418">ZOOM_IN</option>
+            <option value="419">ZOOM_OUT</option>
+            <option value="528">FOCUS</option>
+            <option value="429">CONTACTS</option>
+            <option value="522">STAR</option>
+            <option value="523">POUND</option>
+            <option value="580">APP_SWITCH</option>
+            <option value="582">VOICE_ASSIST</option>
+            <option value="583">ASSIST</option>
+            <option value="usage 0x0c0067">WINDOW</option>
+            <option value="usage 0x0c019C">PROFILE_SWITCH</option>
+            <option value="usage 0x0c01A2">ALL_APPS</option>
+        </optgroup>
+    </template>
+    <template id="android-keys">
+        <optgroup label="Modifiers">
+            <option value="CAPS_LOCK">CAPS_LOCK</option>
+            <option value="SHIFT_LEFT">SHIFT_LEFT</option>
+            <option value="SHIFT_RIGHT">SHIFT_RIGHT</option>
+            <option value="CTRL_LEFT">CTRL_LEFT</option>
+            <option value="CTRL_RIGHT">CTRL_RIGHT</option>
+            <option value="ALT_LEFT">ALT_LEFT</option>
+            <option value="ALT_RIGHT">ALT_RIGHT</option>
+            <option value="META_LEFT">META_LEFT</option>
+            <option value="META_RIGHT">META_RIGHT</option>
+            <option value="FUNCTION">FUNCTION</option>
+        </optgroup>
+        <optgroup label="Controls and symbols">
+            <option value="ESCAPE">ESCAPE</option>
+            <option value="MINUS">MINUS</option>
+            <option value="EQUALS">EQUALS</option>
+            <option value="DEL">DEL</option>
+            <option value="TAB">TAB</option>
+            <option value="LEFT_BRACKET">LEFT_BRACKET</option>
+            <option value="RIGHT_BRACKET">RIGHT_BRACKET</option>
+            <option value="ENTER">ENTER</option>
+            <option value="SEMICOLON">SEMICOLON</option>
+            <option value="APOSTROPHE">APOSTROPHE</option>
+            <option value="GRAVE">GRAVE</option>
+            <option value="BACKSLASH">BACKSLASH</option>
+            <option value="COMMA">COMMA</option>
+            <option value="PERIOD">PERIOD</option>
+            <option value="SLASH">SLASH</option>
+            <option value="SPACE">SPACE</option>
+            <option value="INSERT">INSERT</option>
+            <option value="FORWARD_DEL">FORWARD_DEL</option>
+        </optgroup>
+        <optgroup label="Navigation">
+            <option value="DPAD_UP">DPAD_UP</option>
+            <option value="DPAD_DOWN">DPAD_DOWN</option>
+            <option value="DPAD_LEFT">DPAD_LEFT</option>
+            <option value="DPAD_RIGHT">DPAD_RIGHT</option>
+            <option value="DPAD_CENTER">DPAD_CENTER</option>
+            <option value="PAGE_UP">PAGE_UP</option>
+            <option value="PAGE_DOWN">PAGE_DOWN</option>
+            <option value="MOVE_HOME">MOVE_HOME</option>
+            <option value="MOVE_END">MOVE_END</option>
+        </optgroup>
+        <optgroup label="Letters">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+        </optgroup>
+        <optgroup label="Numbers">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="0">0</option>
+        </optgroup>
+        <optgroup label="Function">
+            <option value="F1">F1</option>
+            <option value="F2">F2</option>
+            <option value="F3">F3</option>
+            <option value="F4">F4</option>
+            <option value="F5">F5</option>
+            <option value="F6">F6</option>
+            <option value="F7">F7</option>
+            <option value="F8">F8</option>
+            <option value="F9">F9</option>
+            <option value="F10">F10</option>
+            <option value="F11">F11</option>
+            <option value="F12">F12</option>
+        </optgroup>
+        <optgroup label="Media">
+            <option value="BRIGHTNESS_DOWN">BRIGHTNESS_DOWN</option>
+            <option value="BRIGHTNESS_UP">BRIGHTNESS_UP</option>
+
+            <option value="VOLUME_MUTE">VOLUME_MUTE</option>
+            <option value="VOLUME_DOWN">VOLUME_DOWN</option>
+            <option value="VOLUME_UP">VOLUME_UP</option>
+
+            <option value="MEDIA_REWIND">MEDIA_REWIND</option>
+            <option value="MEDIA_PLAY_PAUSE">MEDIA_PLAY_PAUSE</option>
+            <option value="MEDIA_FAST_FORWARD">MEDIA_FAST_FORWARD</option>
+        </optgroup>
+        <optgroup label="Keypad">
+            <option value="NUM_LOCK">NUM_LOCK</option>
+            <option value="NUMPAD_DIVIDE">NUMPAD_DIVIDE</option>
+            <option value="NUMPAD_MULTIPLY">NUMPAD_MULTIPLY</option>
+            <option value="NUMPAD_SUBTRACT">NUMPAD_SUBTRACT</option>
+            <option value="NUMPAD_ADD">NUMPAD_ADD</option>
+            <option value="NUMPAD_ENTER">NUMPAD_ENTER</option>
+            <option value="NUMPAD_1">NUMPAD_1</option>
+            <option value="NUMPAD_2">NUMPAD_2</option>
+            <option value="NUMPAD_3">NUMPAD_3</option>
+            <option value="NUMPAD_4">NUMPAD_4</option>
+            <option value="NUMPAD_5">NUMPAD_5</option>
+            <option value="NUMPAD_6">NUMPAD_6</option>
+            <option value="NUMPAD_7">NUMPAD_7</option>
+            <option value="NUMPAD_8">NUMPAD_8</option>
+            <option value="NUMPAD_9">NUMPAD_9</option>
+            <option value="NUMPAD_0">NUMPAD_0</option>
+            <option value="NUMPAD_DOT">NUMPAD_DOT</option>
+            <option value="NUMPAD_COMMA">NUMPAD_COMMA</option>
+            <option value="NUMPAD_EQUALS">NUMPAD_EQUALS</option>
+            <option value="NUMPAD_LEFT_PAREN">NUMPAD_LEFT_PAREN</option>
+            <option value="NUMPAD_RIGHT_PAREN">NUMPAD_RIGHT_PAREN</option>
+        </optgroup>
+        <optgroup label="Gamepad">
+            <option value="BUTTON_A">BUTTON_A</option>
+            <option value="BUTTON_B">BUTTON_B</option>
+            <option value="BUTTON_C">BUTTON_C</option>
+            <option value="BUTTON_X">BUTTON_X</option>
+            <option value="BUTTON_Y">BUTTON_Y</option>
+            <option value="BUTTON_Z">BUTTON_Z</option>
+            <option value="BUTTON_L1">BUTTON_L1</option>
+            <option value="BUTTON_R1">BUTTON_R1</option>
+            <option value="BUTTON_L2">BUTTON_L2</option>
+            <option value="BUTTON_R2">BUTTON_R2</option>
+            <option value="BUTTON_SELECT">BUTTON_SELECT</option>
+            <option value="BUTTON_START">BUTTON_START</option>
+            <option value="BUTTON_MODE">BUTTON_MODE</option>
+            <option value="BUTTON_THUMBL">BUTTON_THUMBL</option>
+            <option value="BUTTON_THUMBR">BUTTON_THUMBR</option>
+        </optgroup>
+        <optgroup label="TV">
+            <option value="GUIDE">GUIDE</option>
+            <option value="DVR">DVR</option>
+            <option value="CAPTIONS">CAPTIONS</option>
+            <option value="TV">TV</option>
+            <option value="PROG_RED">PROG_RED</option>
+            <option value="PROG_GREEN">PROG_GREEN</option>
+            <option value="PROG_YELLOW">PROG_YELLOW</option>
+            <option value="PROG_BLUE">PROG_BLUE</option>
+            <option value="CHANNEL_UP">CHANNEL_UP</option>
+            <option value="CHANNEL_DOWN">CHANNEL_DOWN</option>
+            <option value="LAST_CHANNEL">LAST_CHANNEL</option>
+        </optgroup>
+        <optgroup label="Other">
+            <option value="SCROLL_LOCK">SCROLL_LOCK</option>
+            <option value="ZENKAKU_HANKAKU">ZENKAKU_HANKAKU</option>
+            <option value="RO">RO</option>
+            <option value="HENKAN">HENKAN</option>
+            <option value="KATAKANA_HIRAGANA">KATAKANA_HIRAGANA</option>
+            <option value="MUHENKAN">MUHENKAN</option>
+            <option value="SYSRQ">SYSRQ</option>
+            <option value="POWER">POWER</option>
+            <option value="BREAK">BREAK</option>
+            <option value="KANA">KANA</option>
+            <option value="EISU">EISU</option>
+            <option value="YEN">YEN</option>
+            <option value="MENU">MENU</option>
+            <option value="COPY">COPY</option>
+            <option value="PASTE">PASTE</option>
+            <option value="CUT">CUT</option>
+            <option value="CALCULATOR">CALCULATOR</option>
+            <option value="SLEEP">SLEEP</option>
+            <option value="WAKEUP">WAKEUP</option>
+            <option value="EXPLORER">EXPLORER</option>
+            <option value="ENVELOPE">ENVELOPE</option>
+            <option value="BOOKMARK">BOOKMARK</option>
+            <option value="BACK">BACK</option>
+            <option value="FORWARD">FORWARD</option>
+            <option value="CALL">CALL</option>
+            <option value="MUSIC">MUSIC</option>
+            <option value="HOME">HOME</option>
+            <option value="REFRESH">REFRESH</option>
+            <option value="NOTIFICATION">NOTIFICATION</option>
+            <option value="CAMERA">CAMERA</option>
+            <option value="SEARCH">SEARCH</option>
+            <option value="HEADSETHOOK">HEADSETHOOK</option>
+            <option value="CALENDAR">CALENDAR</option>
+            <option value="ZOOM_IN">ZOOM_IN</option>
+            <option value="ZOOM_OUT">ZOOM_OUT</option>
+            <option value="FOCUS">FOCUS</option>
+            <option value="CONTACTS">CONTACTS</option>
+            <option value="STAR">STAR</option>
+            <option value="POUND">POUND</option>
+            <option value="APP_SWITCH">APP_SWITCH</option>
+            <option value="VOICE_ASSIST">VOICE_ASSIST</option>
+            <option value="ASSIST">ASSIST</option>
+            <option value="WINDOW">WINDOW</option>
+            <option value="PROFILE_SWITCH">PROFILE_SWITCH</option>
+            <option value="ALL_APPS">ALL_APPS</option>
+        </optgroup>
+    </template>
+    <template id="layouts">
+        <option value="keyboard_layout_arabic.kcm">Arabic</option>
+        <option value="keyboard_layout_azerbaijani.kcm">Azerbaijan</option>
+        <option value="keyboard_layout_belarusian.kcm">Belarusian</option>
+        <option value="keyboard_layout_belgian.kcm">Belgian</option>
+        <option value="keyboard_layout_brazilian.kcm">Brazilian</option>
+        <option value="keyboard_layout_bulgarian.kcm">Bulgarian</option>
+        <option value="keyboard_layout_bulgarian_phonetic.kcm">Bulgarian (phonetic)</option>
+        <option value="keyboard_layout_croatian_and_slovenian.kcm">Croatian and Slovenian</option>
+        <option value="keyboard_layout_czech.kcm">Czech (EU - qwertz)</option>
+        <option value="keyboard_layout_czech_qwerty.kcm">Czech (EU - qwerty)</option>
+        <option value="keyboard_layout_danish.kcm">Danish</option>
+        <option value="keyboard_layout_english_uk.kcm">English (UK)</option>
+        <option value="keyboard_layout_english_us.kcm">English (US)</option>
+        <option value="keyboard_layout_english_us_colemak.kcm">English (US), Colemak</option>
+        <option value="keyboard_layout_english_us_dvorak.kcm">English (US), Dvorak</option>
+        <option value="keyboard_layout_english_us_intl.kcm">English (US), International</option>
+        <option value="keyboard_layout_english_us_workman.kcm">English (US), Workman</option>
+        <option value="keyboard_layout_estonian.kcm">Estonian</option>
+        <option value="keyboard_layout_finnish.kcm">Finnish</option>
+        <option value="keyboard_layout_french.kcm">French</option>
+        <option value="keyboard_layout_french_ca.kcm">French (Canada)</option>
+        <option value="keyboard_layout_georgian.kcm">Georgian</option>
+        <option value="keyboard_layout_german.kcm">German</option>
+        <option value="keyboard_layout_greek.kcm">Greek</option>
+        <option value="keyboard_layout_hebrew.kcm">Hebrew</option>
+        <option value="keyboard_layout_hungarian.kcm">Hungarian</option>
+        <option value="keyboard_layout_icelandic.kcm">Icelandic</option>
+        <option value="keyboard_layout_italian.kcm">Italian</option>
+        <option value="keyboard_layout_latvian_qwerty.kcm">Latvian</option>
+        <option value="keyboard_layout_lithuanian.kcm">Lithuanian</option>
+        <option value="keyboard_layout_mongolian.kcm">Mongolian</option>
+        <option value="keyboard_layout_norwegian.kcm">Norwegian</option>
+        <option value="keyboard_layout_persian.kcm">Persian</option>
+        <option value="keyboard_layout_polish.kcm">Polish</option>
+        <option value="keyboard_layout_portuguese.kcm">Portuguese</option>
+        <option value="keyboard_layout_russian.kcm">Russian</option>
+        <option value="keyboard_layout_russian_mac.kcm">Russian, Mac</option>
+        <option value="keyboard_layout_slovak.kcm">Slovak</option>
+        <option value="keyboard_layout_spanish.kcm">Spanish</option>
+        <option value="keyboard_layout_spanish_latin.kcm">Spanish (Latin)</option>
+        <option value="keyboard_layout_swedish.kcm">Swedish</option>
+        <option value="keyboard_layout_swiss_french.kcm">Swiss French</option>
+        <option value="keyboard_layout_swiss_german.kcm">Swiss German</option>
+        <option value="keyboard_layout_turkish.kcm">Turkish</option>
+        <option value="keyboard_layout_turkish_f.kcm">Turkish F</option>
+        <option value="keyboard_layout_ukrainian.kcm">Ukrainian</option>
+    </template>
+
+    <script>
+        let mappingId = 0
+
+        const addButton = document.querySelector("#add")
+        const removeAllButton = document.querySelector("#removeAll")
+        const linuxKeyCodesTemplate = document.querySelector("#linux-keycodes")
+        const androidKeysTemplate = document.querySelector("#android-keys")
+        const tbody = document.querySelector("#tbody")
+        const layout = document.querySelector("#layout")
+        const layout2 = document.querySelector("#layout2")
+        const layoutsTemplate = document.querySelector("#layouts")
+
+        addMapping()
+        addButton.addEventListener("click", addMapping)
+        removeAllButton.addEventListener("click", removeAllMappings)
+
+        layout.appendChild(layoutsTemplate.content.cloneNode(true))
+        layout2.appendChild(layoutsTemplate.content.cloneNode(true))
+
+        function addMapping() {
+            mappingId++
+
+            const from = createSelect()
+            from.name = `from${mappingId}`
+            from.appendChild(linuxKeyCodesTemplate.content.cloneNode(true))
+
+            const to = createSelect()
+            to.name = `to${mappingId}`
+            to.appendChild(androidKeysTemplate.content.cloneNode(true))
+
+            const removeButton = document.createElement("button")
+            removeButton.type = "button"
+            removeButton.textContent = "Remove"
+            removeButton.addEventListener("click", e => {
+                removeTableRow(e.target)
+            })
+
+            tbody.appendChild(createTableRow([
+                from,
+                to,
+                removeButton
+            ]))
+
+            function createSelect() {
+                const option = document.createElement("option")
+                option.value = ""
+                option.selected = true
+
+                const select = document.createElement("select")
+                select.required = true
+                select.appendChild(option)
+
+                return select
+            }
+
+            function createTableRow(elements) {
+                const row = document.createElement("tr")
+                for (const element of elements) {
+                    const td = document.createElement("td")
+                    td.appendChild(element)
+                    row.appendChild(td)
+                }
+                return row
+            }
+
+            function removeTableRow(target) {
+                target.closest("tr").remove()
+            }
+        }
+
+        function removeAllMappings() {
+            tbody.replaceChildren()
+        }
+    </script>
+    <script type="module" src="js/app-simple.js"></script>
+</div>
+</body>
+</html>
