@@ -1,5 +1,7 @@
 # ExKeyMo (static web)
 
+[https://ris58h.github.io/exkeymo/](https://ris58h.github.io/exkeymo/)
+
 A pure static port of [exkeymo-server](https://github.com/ris58h/exkeymo-server):
 build a signed Android APK with a custom keyboard layout entirely in the
 browser. No server, no build step.
