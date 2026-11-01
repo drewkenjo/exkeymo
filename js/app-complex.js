@@ -4,7 +4,7 @@
 import { buildApk, downloadBlob } from './builder.js';
 
 const form = document.querySelector('#build-form');
-const submit = form.querySelector('input[type="submit"]');
+const submit = document.querySelector('input[type="submit"]');
 const statusEl = document.querySelector('#status');
 
 form.addEventListener('submit', async (ev) => {
